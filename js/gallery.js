@@ -48,46 +48,44 @@ const images = [
 
 const gallery = document.querySelector('.gallery');
 
-const  imgTemplate = obj => {
-    const preview = obj.preview;
-    const original = obj.original;
-    const description = obj.description;
-
-    return `<li class="gallery-item">
+const imgTemplate = ({preview, original, description}) =>
+    `<li class="gallery-item">
         <a class="gallery-link" href="${original}">
             <img
-                class="gallery-image"
-                src="${preview}"
-                data-source="${original}"
-                alt="${description}"
+            class="gallery-image"
+            src="${preview}"
+            data-source="${original}"
+            alt="${description}"
             />
         </a>
-    </li>`
-}
+    </li>`;
 
 const galleryTemplate = () => {
     const markup = images.map(imgTemplate).join('\n\n');
-    gallery.insertAdjacentHTML('afterbegin', markup);
-}
+    gallery.innerHTML = markup;
+};
 
 galleryTemplate();
 
-
 const openFullImage = (event) => {
-  event.preventDefault();
-  const { source } = event.target.dataset;
-  if (!source) return;
-  const closeByEscape = (e) => {
+    event.preventDefault();
+    const { source } = event.target.dataset;
+    if (!source) return;
+
+    const closeByEscape = (e) => {
     if (e.code === "Escape") instance.close();
-  };
-  const instance = basicLightbox.create(
-    `<img class="modal-img" src="${source}" width="1112" height="640"/>`,
-    {
-      onShow: () => document.addEventListener("keydown", closeByEscape),
-      onClose: () => document.removeEventListener("keydown", closeByEscape),
-    }
-  );
-  instance.show();
+    };
+
+    const createModal = (source) => {
+        return `<img class="modal-img" src="${source}" width="1112" height="640"/>`;
+    };
+
+    const instance = basicLightbox.create(createModal(source), {
+        onShow: () => document.addEventListener("keydown", closeByEscape),
+        onClose: () => document.removeEventListener("keydown", closeByEscape),
+    });
+
+    instance.show();
 };
 
 gallery.addEventListener("click", openFullImage);
